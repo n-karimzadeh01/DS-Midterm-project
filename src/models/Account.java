@@ -7,15 +7,16 @@ public class Account {
     private String firstName;
     private String lastName;
     private String email;
-    private final String role;
+    private String role;
+    private String DEFAULT_ROLE = "User";
 
-    public Account(String username, String password,String firstName,String lastName,String email,String role){
+    public Account(String username, String password,String firstName,String lastName,String email){
         this.username = username;
         this.password = password;
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
-        this.role = role;
+        this.role = DEFAULT_ROLE;
     }
 
     public String getUsername() {
@@ -56,6 +57,10 @@ public class Account {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 
     @Override

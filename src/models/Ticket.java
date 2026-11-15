@@ -5,15 +5,17 @@ public class Ticket {
     String userName;
     String title;
     int priority;
+    int DEFAULT_PRIORITY = 1; //the least important priority
     String status;
+    String DEFAULT_STATUS = "Open";
     final String createdDate;
 
-    public Ticket(String ticketID, String userName, String title, int priority, String status, String createdDate){
+    public Ticket(String ticketID, String userName, String title, String createdDate){
         this.ticketID = ticketID;
         this.userName = userName;
         this.title = title;
-        this.priority = priority;
-        this.status = status;
+        this.priority = DEFAULT_PRIORITY;
+        this.status = DEFAULT_STATUS;
         this.createdDate = createdDate;
     }
 

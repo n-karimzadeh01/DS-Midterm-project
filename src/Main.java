@@ -35,4 +35,8 @@ public class Main {
     void userPanel(){
         System.out.println("1) Register\n2) Create models.Ticket\n3) My Tickets\n4) Search models.Ticket");
     }
+
+    void ChangeSystemTime(){
+
+    }
 }
