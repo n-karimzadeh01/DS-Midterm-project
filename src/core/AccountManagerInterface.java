@@ -7,10 +7,11 @@ public interface AccountManagerInterface {
     void register();
     boolean login();
     void logout();
-    Account getCurrentUser();
+    String getCurrentUser();
     boolean isLoggedIn();
     boolean isAdmin();
     void addAdmin();
-    Account searchUser(String username);
+    boolean isUser(String username);
     Account deleteUser(String username);
+
 }

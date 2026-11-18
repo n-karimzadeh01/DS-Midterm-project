@@ -1,29 +1,37 @@
 package data_structures;
-//از تابع هش کد استفاده کردم فعلا.
 public class MyHashTable<K, V> implements HashTableInterface<K , V> {
 
-    private Node<K, V>[] buckets;
+    private MyNode<K, V>[] buckets;
     private int size;
     private int capacity;
-    private static final int DEFAULT_CAPACITY = 16; //شاید باید اول بگیرمش و بعد هم متود ریسایز رو عوض کنم جوری که اون هم باز عدد اول بده
+    private static final int DEFAULT_CAPACITY = 23; //شاید باید اول بگیرمش و بعد هم متود ریسایز رو عوض کنم جوری که اون هم باز عدد اول بده
     private static final double LOAD_FACTOR = 0.75;
 
     @SuppressWarnings("unchecked")
     public MyHashTable() {
         capacity = DEFAULT_CAPACITY;
-        buckets = (Node<K, V>[]) new Node[capacity];
+        buckets = (MyNode<K, V>[]) new MyNode[capacity];
         size = 0;
     }
 
+    /**
+     * the goal is to always return a positive index from 0 to capacity
+     * TC: O(1) , SC: O(1)
+     */
     private int hashToBucket(int hash, int capacity){       //I just implemented the method: Math.floorMod(hash, buckets.length) as a part of DJB2
         return hash - (((int)Math.floor((double) hash /capacity)) *capacity);
     }
 
+    /**
+     * DJB2 makes a hash code out of a String, also different hashes for anagrams
+     * TC: O(L) L is the length of the key , SC: O(L) just if the key is not already a string (in our case it's always string so O(1))
+     */
     private int hash(K key) {                                // DJB2 Method
+        if(key == null) throw new IllegalArgumentException("key can not be null");
         String str = key.toString();
         int hash = 5381;
         for(int i= 0; i < str.length(); i++){
-            hash = (hash * 33) + str.charAt(i);             // charAt(i) = UTF-16 code of the character
+            hash = (hash * 33) + str.charAt(i);             // charAt(i) here gives the UTF-16 code of the character
         }
         return hashToBucket(hash, buckets.length);
     }
@@ -35,18 +43,20 @@ public class MyHashTable<K, V> implements HashTableInterface<K , V> {
         }
 
         int index = hash(key);
-        Node<K, V> current = buckets[index];
+        MyNode<K, V> current = buckets[index];
 
+        //updates the value of an exiting pair
         while (current != null) {
-            if (current.key.equals(key)) {
-                current.value = value;
+            if (current.getKey().equals(key)) {
+                current.setValue(value);
                 return;
             }
-            current = current.next;
+            current = current.getNext();
         }
 
-        Node<K, V> newNode = new Node<>(key, value);
-        newNode.next = buckets[index];
+        //makes a new pair and adds it to the beginning of the chain
+        MyNode<K, V> newNode = new MyNode<>(key, value);
+        newNode.setNext(buckets[index]);
         buckets[index] = newNode;
         size++;
 
@@ -62,16 +72,29 @@ public class MyHashTable<K, V> implements HashTableInterface<K , V> {
         }
 
         int index = hash(key);
-        Node<K, V> current = buckets[index];
+        MyNode<K, V> current = buckets[index];
 
         while (current != null) {
-            if (current.key.equals(key)) {
-                return current.value;
+            if (current.getKey().equals(key)) {
+                return current.getValue();
             }
-            current = current.next;
+            current = current.getNext();
         }
 
         return null;
+    }
+
+    // copies all values into the given array (its length must be at least size)
+    public void copyValuesTo(V[] target) {
+        int index = 0;
+        for(int i = 0; i < buckets.length; i++){
+            MyNode<K, V> current = buckets[i];
+            while(current != null){
+                target[index] = current.getValue();
+                index++;
+                current = current.getNext();
+            }
+        }
     }
 
     // Check whether a key exists
@@ -81,13 +104,13 @@ public class MyHashTable<K, V> implements HashTableInterface<K , V> {
         }
 
         int index = hash(key);
-        Node<K, V> current = buckets[index];
+        MyNode<K, V> current = buckets[index];
 
         while (current != null) {
-            if (current.key.equals(key)) {
+            if (current.getKey().equals(key)) {
                 return true;
             }
-            current = current.next;
+            current = current.getNext();
         }
 
         return false;
@@ -100,24 +123,24 @@ public class MyHashTable<K, V> implements HashTableInterface<K , V> {
         }
 
         int index = hash(key);
-        Node<K, V> current = buckets[index];
-        Node<K, V> previous = null;
+        MyNode<K, V> current = buckets[index];
+        MyNode<K, V> previous = null;
 
         while (current != null) {
-            if (current.key.equals(key)) {
+            if (current.getKey().equals(key)) {
 
                 if (previous == null) {
-                    buckets[index] = current.next;
+                    buckets[index] = current.getNext();
                 } else {
-                    previous.next = current.next;
+                    previous.setNext(current.getNext());
                 }
 
                 size--;
-                return current.value;
+                return current.getValue();
             }
 
             previous = current;
-            current = current.next;
+            current = current.getNext();
         }
 
         return null;
@@ -126,17 +149,17 @@ public class MyHashTable<K, V> implements HashTableInterface<K , V> {
     // Resize the table when it becomes too full
     @SuppressWarnings("unchecked")
     private void resize() {
-        Node<K, V>[] oldBuckets = buckets;
+        MyNode<K, V>[] oldBuckets = buckets;
 
-        buckets = (Node<K, V>[]) new Node[capacity *2];
+        buckets = (MyNode<K, V>[]) new MyNode[capacity *2];
         size = 0;
 
-        for (Node<K, V> head : oldBuckets) {
-            Node<K, V> current = head;
+        for (MyNode<K, V> head : oldBuckets) {
+            MyNode<K, V> current = head;
 
             while (current != null) {
-                put(current.key, current.value);
-                current = current.next;
+                put(current.getKey(), current.getValue());
+                current = current.getNext();
             }
         }
         capacity = capacity*2;

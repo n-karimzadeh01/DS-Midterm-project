@@ -1,19 +1,16 @@
-
 package data_structures;
 
-import java.util.Comparator;
-
-public class BinaryHeapPriorityQueue<T>
+public class BinaryHeapPriorityQueue<T extends Comparable<T>>
         implements PriorityQueueInterface<T> {
 
     private T[] heap;
     private int size;
-    private Comparator<T> comparator;
+    private MyComparator<T> comparator;
 
     private static final int DEFAULT_CAPACITY = 16;
 
     @SuppressWarnings("unchecked")
-    public BinaryHeapPriorityQueue(Comparator<T> comparator) {
+    public BinaryHeapPriorityQueue(MyComparator<T> comparator) {
         this.heap = (T[]) new Object[DEFAULT_CAPACITY];
         this.comparator = comparator;
         this.size = 0;
@@ -38,7 +35,7 @@ public class BinaryHeapPriorityQueue<T>
             throw new IllegalStateException("Priority queue is empty");
         }
 
-        T highestPriority = heap[0];
+        T first = heap[0];
 
         size--;
         heap[0] = heap[size];
@@ -48,7 +45,7 @@ public class BinaryHeapPriorityQueue<T>
             siftDown(0);
         }
 
-        return highestPriority;
+        return first;
     }
 
     @Override
@@ -60,11 +57,13 @@ public class BinaryHeapPriorityQueue<T>
         return heap[0];
     }
 
+    // the element at the top is always the first one in the comparator's order
+    // (compare(a, b) < 0 means a comes out before b)
     private void siftUp(int index) {
         while (index > 0) {
             int parent = (index - 1) / 2;
 
-            if (comparator.compare(heap[index], heap[parent]) <= 0) {
+            if (comparator.compare(heap[index], heap[parent]) >= 0) {
                 break;
             }
 
@@ -77,24 +76,24 @@ public class BinaryHeapPriorityQueue<T>
         while (true) {
             int left = 2 * index + 1;
             int right = 2 * index + 2;
-            int largest = index;
+            int first = index;
 
             if (left < size &&
-                    comparator.compare(heap[left], heap[largest]) > 0) {
-                largest = left;
+                    comparator.compare(heap[left], heap[first]) < 0) {
+                first = left;
             }
 
             if (right < size &&
-                    comparator.compare(heap[right], heap[largest]) > 0) {
-                largest = right;
+                    comparator.compare(heap[right], heap[first]) < 0) {
+                first = right;
             }
 
-            if (largest == index) {
+            if (first == index) {
                 break;
             }
 
-            swap(index, largest);
-            index = largest;
+            swap(index, first);
+            index = first;
         }
     }
 

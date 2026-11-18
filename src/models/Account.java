@@ -63,6 +63,7 @@ public class Account {
         this.role = role;
     }
 
+
     @Override
     public String toString() {          //does not show the password cause its important information
         return "Account{" + "username:'" + username + '\'' + ", firstName:'" + firstName + '\'' + ", lastName:'" + lastName + '\'' + ", email:'" + email + '\'' + ", role:'" + role + '\'' + '}';

@@ -1,6 +1,8 @@
 package models;
 
-public class Ticket {
+import java.util.Comparator;
+
+public class Ticket implements Comparable<Ticket> {
     final String ticketID; //string or number?
     String userName;
     String title;
@@ -62,5 +64,10 @@ public class Ticket {
     @Override
     public String toString(){
         return "Ticket{" + "Ticket ID:'" + ticketID + '\'' + ", User Name:'" + userName + '\'' + ", Title:'" + title + '\'' + ", Priority:'" + priority + '\'' + ", Status:'" + status + '\'' + ", On Date:'" + createdDate + '\'' + '}';
+    }
+
+    @Override
+    public int compareTo(Ticket o) {
+        return 0;
     }
 }

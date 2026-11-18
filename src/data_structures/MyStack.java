@@ -1,6 +1,6 @@
 package data_structures;
 
-class MyStack<E> implements Stack<E> {
+public class MyStack<E> implements Stack<E> {
     private E[] myStack;
     private int size;
 

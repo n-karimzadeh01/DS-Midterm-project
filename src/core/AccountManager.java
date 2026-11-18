@@ -6,9 +6,21 @@ import models.Account;
 import java.util.Scanner;
 
 public class AccountManager implements AccountManagerInterface {
-    private MyHashTable<String, Account> accounts;
+    private MyHashTable<String, Account> accounts = new MyHashTable<>();
     private Account currentUser;
     Scanner sc = new Scanner(System.in);
+
+    public void loadAccount(Account account) {
+        accounts.put(account.getUsername(), account);
+    }
+
+    // creates admin/admin if it doesn't exist (called after loading the file)
+    public void ensureDefaultAdmin() {
+        if(accounts.containsKey("admin")) return;
+        Account admin = new Account("admin", "admin", "admin", "admin", "admin@admin.com");
+        admin.setRole("Admin");
+        accounts.put("admin", admin);
+    }
 
 
     @Override
@@ -45,18 +57,19 @@ public class AccountManager implements AccountManagerInterface {
         username = sc.nextLine();
         target = searchUser(username);
         while(target == null){
-            System.out.println("username not found.\n to quit, enter e\n to try again make sure to enter a username: ");
+            System.out.println("username not found.\n to quit, enter q\n to try again make sure to enter a username: ");
             username = sc.nextLine();
-            if(username.equals("e")) return false;
+            if(username.equals("q")) return false;
             target = searchUser(username);
         }
         System.out.println("enter your password: ");
         password = sc.nextLine();
-        while(password.equals(target.getPassword())){
-            System.out.println("wrong password, try entering another password or enter e to exit: ");
+        while(!password.equals(target.getPassword())){
+            System.out.println("wrong password, try entering another password or enter q to quit: ");
             password = sc.nextLine();
-            if(username.equals("e")) return false;
+            if(username.equals("q")) return false;
         }
+        currentUser = target;
         return true;
 
     }
@@ -66,9 +79,10 @@ public class AccountManager implements AccountManagerInterface {
         currentUser = null;
     }
 
+    //*
     @Override
-    public Account getCurrentUser() {
-        return currentUser;
+    public String getCurrentUser() {
+        return currentUser.getUsername();
     }
 
     @Override
@@ -80,6 +94,7 @@ public class AccountManager implements AccountManagerInterface {
     public boolean isAdmin() {
         return (currentUser.getRole().equals("Admin"));
     }
+
 
     @Override
     public void addAdmin() {
@@ -96,10 +111,15 @@ public class AccountManager implements AccountManagerInterface {
         newAdmin.setRole("Admin");
     }
 
-    @Override
-    public Account searchUser(String username) {
+
+    private Account searchUser(String username) {
         if(!accounts.containsKey(username)) return null;
         return accounts.get(username);
+    }
+
+    @Override
+    public boolean isUser(String username){
+        return searchUser(username) == null;
     }
 
     @Override
